@@ -1,8 +1,6 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
-library;
+library pico;
 
-export 'src/pico_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/async_value.dart';
+export 'src/pico_builder.dart';
+export 'src/store.dart';
+export 'src/target_listener.dart';
