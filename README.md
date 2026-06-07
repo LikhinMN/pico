@@ -1,39 +1,72 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Pico ⚡
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
+A high-performance, minimalist, and surgical state management library for Flutter and Dart.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
+## Why Pico?
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+- **Surgical Rebuilds**: Components only rebuild when their explicitly selected slice of state changes.
+- **O(1) Microtask Batching**: Multiple synchronous state updates are batched together. The UI is rebuilt exactly once per frame tick.
+- **Dart 3 Native**: Embraces Records, pattern matching, and sealed classes.
+- **Hooks Integration**: Built-in adapter for `flutter_hooks` via `usePico`.
+- **Zero Boilerplate**: Designed to stay out of your way. No code generation required.
 
-## Features
+## Quick Start
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+### 1. Define your State
+Use Dart 3 Records for immutable, deeply-comparable state:
 
 ```dart
-const like = 'sample';
+import 'package:pico/pico.dart';
+
+typedef AppState = ({
+  int count,
+  bool isDark,
+  AsyncValue<String> user,
+});
+
+final store = Store<AppState>((
+  count: 0,
+  isDark: false,
+  user: const AsyncData('No user yet'),
+));
 ```
 
-## Additional information
+### 2. Update State
+```dart
+void increment() {
+  store.set((s) => (count: s.count + 1, isDark: s.isDark, user: s.user));
+}
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+// Built-in Async resolution handling
+Future<void> fetchUser() async {
+  await store.executeAsync(
+    () => Future.delayed(const Duration(seconds: 2), () => 'Dash'),
+    (state, userAsyncVal) => (count: state.count, isDark: state.isDark, user: userAsyncVal),
+  );
+}
+```
+
+### 3. Consume State in UI
+Wrap your UI slices with `PicoBuilder` to guarantee it only rebuilds when that specific property updates:
+
+```dart
+PicoBuilder<AppState, int>(
+  store: store,
+  selector: (state) => state.count,
+  builder: (context, count) {
+    return Text('$count'); // Rebuilds ONLY when state.count changes
+  },
+)
+```
+
+Or using `flutter_hooks`:
+
+```dart
+class HookExample extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    final count = usePico(store, (state) => state.count);
+    return Text('$count');
+  }
+}
+```
