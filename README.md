@@ -1,19 +1,33 @@
-# Pico ⚡
+# Pico
 
-A high-performance, minimalist, and surgical state management library for Flutter and Dart.
+Featherweight, zero-boilerplate state management for Flutter
+
+[![pub package](https://img.shields.io/pub/v/pico.svg)](https://pub.dev/packages/pico)
+[![likes](https://img.shields.io/pub/likes/pico.svg)](https://pub.dev/packages/pico)
+[![pub points](https://img.shields.io/pub/points/pico.svg)](https://pub.dev/packages/pico)
 
 ## Why Pico?
 
-- **Surgical Rebuilds**: Components only rebuild when their explicitly selected slice of state changes.
-- **O(1) Microtask Batching**: Multiple synchronous state updates are batched together. The UI is rebuilt exactly once per frame tick.
-- **Dart 3 Native**: Embraces Records, pattern matching, and sealed classes.
-- **Hooks Integration**: Built-in adapter for `flutter_hooks` via `usePico`.
-- **Zero Boilerplate**: Designed to stay out of your way. No code generation required.
+State management in Flutter has historically forced developers to choose between two extremes: drowning in the immense boilerplate and inherited complexity of BLoC and Provider, or battling the steep learning curve and constant code-generation steps required by modern solutions like Riverpod. Pico was built to offer a third path. 
 
-## Quick Start
+Pico gives you robust, high-performance state management that stays entirely out of your way. Our core pillars are:
+- **Zero Context Required:** Access and mutate state globally from any function, anywhere, without passing `BuildContext`.
+- **Surgical Rebuilds:** Leverage high-performance slice caching. Your UI components only rebuild when their exact slice of state changes—never before.
+- **Built-in Async State:** Safely manage complex network requests natively with our generic `AsyncValue` primitive.
+- **Pure Dart:** No FFI, no code-generation (`build_runner`), and absolutely zero magic. Just simple, beautiful Dart code.
+
+## Installation
+
+```bash
+flutter pub add pico
+```
+
+## Quick Start (The 3-Minute Guide)
+
+Pico is so simple, you can learn it in three minutes. 
 
 ### 1. Define your State
-Use Dart 3 Records for immutable, deeply-comparable state:
+We highly recommend using Dart 3 Records for strict immutability and automatic deep equality:
 
 ```dart
 import 'package:pico/pico.dart';
@@ -21,52 +35,109 @@ import 'package:pico/pico.dart';
 typedef AppState = ({
   int count,
   bool isDark,
-  AsyncValue<String> user,
 });
+```
 
+### 2. Create the Store
+Instantiate a global `Store` with your initial state.
+
+```dart
 final store = Store<AppState>((
-  count: 0,
+  count: 0, 
   isDark: false,
-  user: const AsyncData('No user yet'),
 ));
 ```
 
-### 2. Update State
+### 3. Write an Action
+Actions are just standard Dart functions. Call `store.set()` and return the new state. 
+
 ```dart
 void increment() {
-  store.set((s) => (count: s.count + 1, isDark: s.isDark, user: s.user));
-}
-
-// Built-in Async resolution handling
-Future<void> fetchUser() async {
-  await store.executeAsync(
-    () => Future.delayed(const Duration(seconds: 2), () => 'Dash'),
-    (state, userAsyncVal) => (count: state.count, isDark: state.isDark, user: userAsyncVal),
-  );
+  store.set((state) => (
+    count: state.count + 1, 
+    isDark: state.isDark,
+  ));
 }
 ```
 
-### 3. Consume State in UI
-Wrap your UI slices with `PicoBuilder` to guarantee it only rebuilds when that specific property updates:
+### 4. Consume in the UI
+Wrap your UI slices with `PicoBuilder`. You can easily trigger your actions via standard callbacks.
 
 ```dart
-PicoBuilder<AppState, int>(
+class CounterView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        PicoBuilder<AppState, int>(
+          store: store,
+          selector: (state) => state.count,
+          builder: (context, count) {
+            return Text('Count: $count');
+          },
+        ),
+        ElevatedButton(
+          onPressed: increment, 
+          child: Text('Increment'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+*Prefer Hooks? We've got you covered with `usePico`:*
+```dart
+final count = usePico(store, (state) => state.count);
+```
+
+## Core Feature: Surgical Rebuilds (Slice Caching)
+
+Pico is extremely fast because it natively prevents unnecessary rebuilds. By defining a `selector`, you tell Pico exactly which "slice" of the global state a widget cares about. 
+
+```dart
+PicoBuilder<AppState, String>(
   store: store,
-  selector: (state) => state.count,
-  builder: (context, count) {
-    return Text('$count'); // Rebuilds ONLY when state.count changes
+  // This widget ONLY cares about the user's name
+  selector: (state) => state.user.name,
+  // If state.count updates, this widget is completely ignored!
+  builder: (context, userName) {
+    return Text('Hello, $userName!');
   },
 )
 ```
 
-Or using `flutter_hooks`:
+Under the hood, Pico uses an O(1) Microtask Batching engine to intercept synchronous state spam and safely update the UI exactly once per frame tick. Need to compare complex lists or objects? Just pass a custom collection equality function to the optional `equals:` parameter.
 
+## Core Feature: Async State Built-in
+
+Network requests and asynchronous operations are notoriously difficult to track in the UI. Pico ships natively with an `AsyncValue` primitive inspired by the best in the ecosystem.
+
+Track loading, data, and error states gracefully:
 ```dart
-class HookExample extends HookWidget {
-  @override
-  Widget build(BuildContext context) {
-    final count = usePico(store, (state) => state.count);
-    return Text('$count');
+Future<void> fetchUser() async {
+  store.set((s) => (..., user: AsyncLoading()));
+  
+  try {
+    final data = await api.getUser();
+    store.set((s) => (..., user: AsyncData(data)));
+  } catch (err, stack) {
+    store.set((s) => (..., user: AsyncError(err, stack)));
   }
 }
+```
+
+Then, elegantly unpack the state in your UI using the `.when()` pattern matcher:
+```dart
+PicoBuilder<AppState, AsyncValue<User>>(
+  store: store,
+  selector: (state) => state.user,
+  builder: (context, userState) {
+    return userState.when(
+      loading: () => const CircularProgressIndicator(),
+      data: (user) => Text('Welcome ${user.name}'),
+      error: (err, stack) => Text('Failed to load user: $err'),
+    );
+  },
+)
 ```
