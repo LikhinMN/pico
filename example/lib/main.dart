@@ -18,9 +18,17 @@ void toggleTheme() {
 }
 
 Future<void> fetchUser() async {
-  store.set((s) => (count: s.count, isDark: s.isDark, user: const AsyncLoading()));
+  store.set(
+    (s) => (count: s.count, isDark: s.isDark, user: const AsyncLoading()),
+  );
   await Future.delayed(const Duration(seconds: 2));
-  store.set((s) => (count: s.count, isDark: s.isDark, user: const AsyncData('Dash the Dart')));
+  store.set(
+    (s) => (
+      count: s.count,
+      isDark: s.isDark,
+      user: const AsyncData('Dash the Dart'),
+    ),
+  );
 }
 
 void main() {
@@ -36,7 +44,7 @@ class MyApp extends StatelessWidget {
       store: store,
       selector: (state) => state.isDark,
       builder: (context, isDark) {
-        print('🎨 Theme Rebuilt');
+        debugPrint('🎨 Theme Rebuilt');
         return MaterialApp(
           title: 'Pico Showcase',
           theme: isDark ? ThemeData.dark() : ThemeData.light(),
@@ -53,9 +61,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pico Showcase'),
-      ),
+      appBar: AppBar(title: const Text('Pico Showcase')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +71,10 @@ class HomePage extends StatelessWidget {
               selector: (state) => state.user,
               builder: (context, user) {
                 return user.when(
-                  data: (data) => Text(data, style: Theme.of(context).textTheme.headlineSmall),
+                  data: (data) => Text(
+                    data,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   loading: () => const CircularProgressIndicator(),
                   error: (err, stack) => Text('Error: $err'),
                 );
@@ -76,7 +85,7 @@ class HomePage extends StatelessWidget {
               store: store,
               selector: (state) => state.count,
               builder: (context, count) {
-                print('🔢 Counter Rebuilt');
+                debugPrint('🔢 Counter Rebuilt');
                 return Text(
                   '$count',
                   style: Theme.of(context).textTheme.headlineMedium,

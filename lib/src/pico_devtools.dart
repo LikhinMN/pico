@@ -1,14 +1,14 @@
 import 'dart:developer';
 
 /// A middleware for [Store] that broadcasts state updates to the Dart VM Service.
-/// 
-/// This event stream can be intercepted by a custom Flutter DevTools extension 
+///
+/// This event stream can be intercepted by a custom Flutter DevTools extension
 /// to visualize state history and enable time-travel debugging.
-/// 
-/// Usage: 
+///
+/// Usage:
 /// ```dart
 /// final store = Store(
-///   initialState, 
+///   initialState,
 ///   onUpdate: picoDevToolsMiddleware,
 /// );
 /// ```

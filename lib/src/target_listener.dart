@@ -14,7 +14,7 @@ class TargetListener<S, T> {
 
   bool updateAndCheck(S newState) {
     final newSlice = selector(newState);
-    
+
     final bool hasChanged;
     if (equals != null) {
       hasChanged = !equals!(cachedSlice, newSlice);
@@ -26,7 +26,7 @@ class TargetListener<S, T> {
       cachedSlice = newSlice;
       return true;
     }
-    
+
     return false;
   }
 }
