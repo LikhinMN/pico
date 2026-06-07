@@ -13,3 +13,6 @@ pubspec.lock
 # Agent
 .agents/
 skills-lock.json
+
+# Builds
+build/
