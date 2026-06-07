@@ -1,7 +1,7 @@
 name: pico
-description: A starting point for Dart libraries or applications.
+description: Featherweight, zero-boilerplate state management for Flutter.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/likhinmn/pico
 
 environment:
   sdk: ^3.11.5
