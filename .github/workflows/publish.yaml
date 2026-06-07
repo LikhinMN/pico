@@ -9,10 +9,13 @@ jobs:
   publish:
     # Required for pub.dev OIDC authentication
     permissions:
-      id-token: write 
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - uses: dart-lang/setup-dart@v1
       
       - uses: subosito/flutter-action@v2
         with:
