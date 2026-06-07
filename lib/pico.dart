@@ -1,4 +1,4 @@
-library pico;
+
 
 export 'src/async_value.dart';
 export 'src/pico_builder.dart';
