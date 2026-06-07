@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'target_listener.dart';
+import 'async_value.dart';
 
 class Store<S> {
   Store(S initialState, {this.onUpdate}) : _state = initialState;
@@ -37,6 +38,21 @@ class Store<S> {
         }
         _isBatching = false;
       });
+    }
+  }
+
+  /// Executes an asynchronous [computation], automatically dispatching
+  /// [AsyncLoading], [AsyncData], and [AsyncError] states to the provided [setter].
+  Future<void> executeAsync<T>(
+    Future<T> Function() computation,
+    S Function(S state, AsyncValue<T> value) setter,
+  ) async {
+    set((state) => setter(state, AsyncLoading<T>()));
+    try {
+      final result = await computation();
+      set((state) => setter(state, AsyncData<T>(result)));
+    } catch (e, stack) {
+      set((state) => setter(state, AsyncError<T>(e, stack)));
     }
   }
 }
