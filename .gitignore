@@ -16,3 +16,4 @@ skills-lock.json
 
 # Builds
 build/
+coverage/

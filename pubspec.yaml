@@ -16,3 +16,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  pana: ^0.23.12
+  coverage: ^1.15.1
