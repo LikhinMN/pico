@@ -1,75 +1,67 @@
 ---
 name: flutter-use-pico-state
-description: Use the Pico package for state management in Flutter applications. Use this skill whenever building UI features, managing global state, or handling async API data.
+description: Uses Pico for state management in Flutter apps. Use this skill when the user asks to build UI, manage global state, handle data fetching, or architect the app.
+version: 1.0.0
+author: Development Team
+tags: [flutter, state-management, pico, architecture]
 ---
 
-# Pico State Management Guidelines
+# Pico State Management
 
-You are an expert in `pico`, a featherweight, zero-boilerplate state management library for Flutter. When building state in this project, do not use Provider, Riverpod, or BLoC. Use Pico exclusively.
+## Overview
+This skill provides automated guidelines and structural verification for implementing the featherweight Pico state management library to prevent unnecessary rebuilds and enforce strict state best practices.
 
-## Core Rules
+## When to Use
+* When creating new Flutter UI components that require state.
+* When structuring or refactoring global application state.
+* When fetching, handling, and displaying asynchronous data or network requests.
+* Do not use for Provider, Riverpod, or BLoC implementations.
 
-1. **State Definition**: Always define state using strict Dart 3 Records for immutability and automatic deep equality.
-2. **Store Creation**: Instantiate a global `Store<T>` with the initial state.
-3. **Mutations**: Never pass `BuildContext` to mutate state. Actions are pure Dart functions that call `store.set((state) => newState)`.
-4. **UI Consumption**: Use `PicoBuilder` or `usePico` (if flutter_hooks is used) to read state. YOU MUST provide a `selector` to surgically listen only to the specific slice of state the widget needs to avoid unnecessary rebuilds.
-5. **Background Subscriptions**: Use `store.subscribe` or `store.subscribeWithSelector` when you need to react to state changes outside of the UI tree.
+## Instructions
+1. Verify state models are defined exclusively using strict Dart 3 Records for deep immutability.
+2. Ensure global `Store<T>` singletons are used for state initialization.
+3. Validate that actions are pure Dart functions and never pass `BuildContext` to mutate state. They must call `store.set((state) => newState)`.
+4. Inspect UI consumption components (`PicoBuilder` or `usePico`) to ensure they *always* implement a `selector` to surgically listen to specific slices of state.
+5. Check that network operations use `store.executeAsync` mapping to an `AsyncValue` primitive.
 
-## Code Example
+## Output Format
+Structure your findings into a clear execution breakdown:
+* **Verdict**: Pass, Pass with Warnings, or Fail.
+* **Issues**: Numbered list containing the exact line reference and severity.
+* **Fix**: A code block suggesting the exact correction.
 
+## Examples
+### Input
 ```dart
-import 'package:flutter/material.dart';
-import 'package:pico/pico.dart';
-
-// 1. Define State
-typedef AppState = ({ int count, bool isDark });
-
-// 2. Global Store
-final store = Store<AppState>((count: 0, isDark: false));
-
-// 3. Action
-void increment() {
-  store.set((s) => (count: s.count + 1, isDark: s.isDark));
-}
-
-// 4. UI 
-class CounterText extends StatelessWidget {
+class CounterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return PicoBuilder<AppState, int>(
+    return PicoBuilder<AppState, AppState>(
       store: store,
-      // CRITICAL: Always provide a selector for surgical rebuilds
-      selector: (state) => state.count,
-      builder: (context, count) => Text('$count'),
+      selector: (state) => state,
+      builder: (context, state) {
+        return Text('Count: ${state.count}');
+      },
     );
   }
 }
 ```
 
-## Handling Async Data
-When fetching network data, ALWAYS use Pico's `AsyncValue` primitive and the `store.executeAsync` method.
-
+### Output
+* **Verdict**: Fail
+* **Issues**: 1. Missing surgical slice selection which causes unnecessary full-widget rebuilds. 
+* **Fix**: Provide a specific `selector` for the count property and update the generic types.
 ```dart
-typedef DataState = ({ AsyncValue<String> userProfile });
-final dataStore = Store<DataState>((userProfile: const AsyncLoading()));
-
-Future<void> fetchProfile() async {
-  await dataStore.executeAsync<String>(
-    () async => await api.getUser(),
-    (state, value) => (userProfile: value),
-  );
-}
-
-// In the UI:
-PicoBuilder<DataState, AsyncValue<String>>(
-  store: dataStore,
-  selector: (s) => s.userProfile,
-  builder: (context, profileState) {
-    return profileState.when(
-      data: (user) => Text('Hello $user'),
-      error: (err, stack) => Text('Error: $err'),
-      loading: () => CircularProgressIndicator(),
+class CounterWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PicoBuilder<AppState, int>(
+      store: store,
+      selector: (state) => state.count,
+      builder: (context, count) {
+        return Text('Count: $count');
+      },
     );
   }
-)
+}
 ```
