@@ -1,0 +1,51 @@
+# Pico State Management
+
+Pico is a featherweight, zero-boilerplate state management library for Flutter.
+
+## Core Principles
+1. Define state using Dart 3 Records.
+2. Use global `Store` instances.
+3. Call `store.set()` to mutate state synchronously.
+4. Use `PicoBuilder` or `usePico` with a `selector` to surgically rebuild UI components only when their specific slice of state changes.
+5. Use `AsyncValue` and `store.executeAsync` for network/async operations.
+6. Use `store.subscribe((state, prevState) {})` to listen to changes outside the UI.
+
+## Basic Example
+```dart
+import 'package:pico/pico.dart';
+
+typedef AppState = ({ int count });
+final store = Store<AppState>((count: 0));
+
+void increment() => store.set((s) => (count: s.count + 1));
+
+// UI
+PicoBuilder<AppState, int>(
+  store: store,
+  selector: (state) => state.count,
+  builder: (context, count) => Text('$count'),
+)
+```
+
+## Async Example
+```dart
+final store = Store<AsyncValue<String>>(const AsyncLoading());
+
+Future<void> fetch() async {
+  await store.executeAsync<String>(
+    () async => 'Data fetched',
+    (state, value) => value,
+  );
+}
+
+// UI 
+PicoBuilder<AsyncValue<String>, AsyncValue<String>>(
+  store: store,
+  selector: (s) => s,
+  builder: (context, state) => state.when(
+    data: (d) => Text(d),
+    error: (e, s) => Text('$e'),
+    loading: () => CircularProgressIndicator(),
+  ),
+)
+```
