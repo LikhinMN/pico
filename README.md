@@ -7,6 +7,7 @@
 Featherweight, zero-boilerplate state management for Flutter
 
 [![pub package](https://img.shields.io/pub/v/pico.svg)](https://pub.dev/packages/pico)
+[![downloads](https://img.shields.io/pub/dm/pico.svg)](https://pub.dev/packages/pico)
 [![likes](https://img.shields.io/pub/likes/pico.svg)](https://pub.dev/packages/pico)
 [![pub points](https://img.shields.io/pub/points/pico.svg)](https://pub.dev/packages/pico)
 
