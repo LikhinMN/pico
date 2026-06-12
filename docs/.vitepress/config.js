@@ -18,6 +18,15 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Learn (Todo App)',
+        items: [
+          { text: '1. Project Setup', link: '/tutorial/1-setup' },
+          { text: '2. Defining State', link: '/tutorial/2-state' },
+          { text: '3. Building the UI', link: '/tutorial/3-ui' },
+          { text: '4. Adding Actions', link: '/tutorial/4-actions' }
+        ]
+      },
+      {
         text: 'Core Concepts',
         items: [
           { text: 'Store & Actions', link: '/guide/store' },
