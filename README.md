@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/public/logo.png" alt="Pico Logo" width="200" />
+</p>
+
 # Pico
 
 Featherweight, zero-boilerplate state management for Flutter

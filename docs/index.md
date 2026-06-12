@@ -5,6 +5,9 @@ hero:
   name: "Pico"
   text: "State Management for Flutter."
   tagline: Featherweight, zero-boilerplate state management library.
+  image:
+    src: /logo.png
+    alt: Pico Logo
   actions:
     - theme: brand
       text: Get Started

@@ -4,7 +4,9 @@ export default defineConfig({
   title: "Pico",
   description: "Featherweight, zero-boilerplate state management for Flutter.",
   base: '/pico/',
+  head: [['link', { rel: 'icon', href: '/pico/logo.png' }]],
   themeConfig: {
+    logo: '/logo.png',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Documentation', link: '/guide/getting-started' }
