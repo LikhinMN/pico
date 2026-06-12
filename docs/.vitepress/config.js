@@ -22,6 +22,7 @@ export default defineConfig({
         items: [
           { text: 'Store & Actions', link: '/guide/store' },
           { text: 'Surgical Rebuilds', link: '/guide/surgical-rebuilds' },
+          { text: 'Hooks (usePico)', link: '/guide/use-pico' },
           { text: 'Async Data', link: '/guide/async-state' }
         ]
       }

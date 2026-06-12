@@ -2,11 +2,11 @@
 
 Pico is designed to be ridiculously fast. It achieves this by forcing developers to define exactly what "slice" of state a UI component cares about. If a different part of the global state updates, your component will not rebuild.
 
-Pico provides two identical ways to consume state: `PicoBuilder` (for standard Flutter) and `usePico` (for Flutter Hooks).
+For standard Flutter widgets, you consume state using `PicoBuilder`. *(If you use `flutter_hooks`, see our dedicated [usePico Hooks Guide](/guide/use-pico)).*
 
-## 1. `PicoBuilder`
+## `PicoBuilder`
 
-`PicoBuilder` is a standard Flutter Widget. 
+`PicoBuilder` is a highly-optimized Flutter Widget that connects your UI to a specific slice of a `Store`.
 
 ### API Signature
 ```dart
@@ -28,7 +28,8 @@ PicoBuilder<StoreType, SliceType>(
 ```dart
 PicoBuilder<AppState, String>(
   store: globalStore,
-  selector: (state) => state.user.name, // Only listens to the name
+  // This widget ONLY cares about the user's name
+  selector: (state) => state.user.name, 
   builder: (context, userName) {
     print('Rebuilding Name Widget!');
     return Text('Hello, $userName!');
@@ -36,46 +37,9 @@ PicoBuilder<AppState, String>(
 )
 ```
 
-## 2. `usePico` (Hooks Integration)
-
-If you use `flutter_hooks`, Pico provides a zero-boilerplate hook that behaves identically to `PicoBuilder`.
-
-### API Signature
-```dart
-SliceType usePico<StoreType, SliceType>(
-  Store<StoreType> store,
-  SliceType Function(StoreType state) selector,
-  [bool Function(SliceType, SliceType)? equals]
-)
-```
-
-### Detailed Parameters
-- **`store`**: The `Store` instance.
-- **`selector` (Required)**: The slice extraction function.
-- **`equals` (Optional)**: A custom equality comparator.
-
-### Example
-```dart
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:pico/pico.dart';
-
-class CounterView extends HookWidget {
-  @override
-  Widget build(BuildContext context) {
-    // Subscribes the HookWidget to just the 'count' property
-    final count = usePico<AppState, int>(
-      globalStore, 
-      (state) => state.count,
-    );
-
-    return Text('Count: $count');
-  }
-}
-```
-
 ## Advanced: Custom Equality
 
-If your state includes `List` or `Map` types, and you update them by creating new lists with identical contents, Dart's default `==` operator will return `false` (because the object references in memory are different). This will cause Pico to rebuild the widget.
+If your state includes `List` or `Map` types, and you update them by creating new collections with identical contents, Dart's default `==` operator will return `false` (because the object references in memory are different). This will cause Pico to rebuild the widget.
 
 To solve this, use the `equals` parameter:
 
