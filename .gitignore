@@ -17,3 +17,5 @@ skills-lock.json
 # Builds
 build/
 coverage/
+docs/node_modules/
+docs/.vitepress/cache/
