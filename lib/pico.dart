@@ -2,6 +2,7 @@
 ///
 /// It provides core primitives like `Store` and `AsyncValue`, along with
 /// builder widgets to construct reactive user interfaces.
+library;
 
 export 'src/async_value.dart';
 export 'src/async_value_extensions.dart';

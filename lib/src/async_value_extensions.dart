@@ -1,5 +1,6 @@
 import 'async_value.dart';
 
+/// A set of helpful extension methods for [AsyncValue] to unwrap or transform data.
 extension AsyncValueX<T> on AsyncValue<T> {
   /// Returns the underlying data if present, otherwise returns null.
   T? get valueOrNull => when(

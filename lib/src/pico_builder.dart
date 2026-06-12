@@ -2,7 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'store.dart';
 import 'target_listener.dart';
 
+/// A highly-optimized widget that connects to a [Store] and rebuilds
+/// only when a specific slice of the state changes.
 class PicoBuilder<S, T> extends StatefulWidget {
+  /// Creates a [PicoBuilder] widget.
   const PicoBuilder({
     super.key,
     required this.store,
@@ -11,9 +14,16 @@ class PicoBuilder<S, T> extends StatefulWidget {
     this.equals,
   });
 
+  /// The [Store] instance to listen to.
   final Store<S> store;
+
+  /// A pure function that extracts the precise piece of data needed.
   final T Function(S state) selector;
+
+  /// An optional custom equality comparator to override deep equality behavior.
   final bool Function(T oldSlice, T newSlice)? equals;
+
+  /// The builder function that receives the `context` and the precise `slice` of data.
   final Widget Function(BuildContext context, T value) builder;
 
   @override

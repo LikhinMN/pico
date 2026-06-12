@@ -1,4 +1,6 @@
 import 'package:path/path.dart' as p;
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 const String skillContent = r'''
@@ -73,14 +75,16 @@ class CounterWidget extends StatelessWidget {
 
 void main() {
   final currentPath = Directory.current.path;
-  final skillsDir = Directory(p.join(currentPath, '.agents', 'skills', 'flutter-use-pico-state'));
+  final skillsDir = Directory(
+    p.join(currentPath, '.agents', 'skills', 'flutter-use-pico-state'),
+  );
 
   if (!skillsDir.existsSync()) {
     skillsDir.createSync(recursive: true);
   }
 
   final skillFile = File(p.join(skillsDir.path, 'SKILL.md'));
-  
+
   if (skillFile.existsSync()) {
     print('✅ Pico agent skill already exists at: ${skillFile.path}');
     return;
