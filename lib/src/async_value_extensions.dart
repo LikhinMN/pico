@@ -2,8 +2,11 @@ import 'async_value.dart';
 
 extension AsyncValueX<T> on AsyncValue<T> {
   /// Returns the underlying data if present, otherwise returns null.
-  T? get valueOrNull =>
-      when(data: (data) => data, error: (err, stack) => null, loading: () => null);
+  T? get valueOrNull => when(
+    data: (data) => data,
+    error: (err, stack) => null,
+    loading: () => null,
+  );
 
   /// Returns the underlying data, throwing an error if it is not in the data state.
   T get requireValue => when(
