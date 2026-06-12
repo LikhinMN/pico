@@ -156,5 +156,11 @@ We've made it effortless to teach your AI exactly how to write Pico code:
 **Option 1: `.cursorrules` / `.windsurfrules`**
 Simply point your AI to our standard `llms.txt` file which contains high-density, AI-optimized instructions. Ask your AI to read `https://raw.githubusercontent.com/likhinmn/pico/main/llms.txt`.
 
-**Option 2: Agent Skills**
-If you are using an advanced Agent architecture (like DeepMind's coding agents), you can copy the `agent_skills/flutter-use-pico-state/` directory from this repository directly into your project's `.agents/skills/` folder. Your AI will automatically inherit Pico expertise!
+**Option 2: Agent Skills CLI**
+If you are using an advanced Agent architecture (like DeepMind's coding agents), you can inject the Pico Skill directly into your agent's brain by running our built-in CLI command:
+
+```bash
+dart run pico:add_skill
+```
+
+This will automatically scaffold the `.agents/skills/flutter-use-pico-state/SKILL.md` file in your repository. Your AI will instantly inherit Pico expertise!
